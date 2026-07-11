@@ -1,6 +1,6 @@
 name: Daily Portfolio Check
 
-on:
+"on":
   schedule:
     # 13:35 UTC ≈ 9:35am US Eastern during Daylight Time (EDT, roughly
     # mid-March to early November). During Standard Time (EST) this runs at
