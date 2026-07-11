@@ -1,0 +1,6 @@
+# 12.0.0rc0 is a release candidate, required for proper SnapTrade Personal
+# API key auth (client IDs starting with PERS-). Stable 11.x only supports
+# the older Commercial user-registration flow. See
+# docs.snaptrade.com/docs/authentication-methods.
+snaptrade-python-sdk==12.0.0rc0
+requests>=2.31

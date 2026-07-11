@@ -1,0 +1,43 @@
+name: Daily Portfolio Check
+
+on:
+  schedule:
+    # 13:35 UTC ≈ 9:35am US Eastern during Daylight Time (EDT, roughly
+    # mid-March to early November). During Standard Time (EST) this runs at
+    # 8:35am ET instead, since GitHub Actions cron is fixed to UTC and does
+    # not shift with US clock changes. Adjust the hour twice a year if you
+    # want a fixed local time, or just leave it -- it's still "the market's
+    # been open ~5 min" either way.
+    - cron: "35 13 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r portfolio_alerts/requirements.txt
+
+      - name: Run daily portfolio check
+        env:
+          SNAPTRADE_CLIENT_ID: ${{ secrets.SNAPTRADE_CLIENT_ID }}
+          SNAPTRADE_CONSUMER_KEY: ${{ secrets.SNAPTRADE_CONSUMER_KEY }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python portfolio_alerts/daily_check.py
+
+      - name: Commit updated state.json
+        run: |
+          git config user.name "portfolio-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add portfolio_alerts/state.json
+          git diff --cached --quiet || git commit -m "Update portfolio state [skip ci]"
+          git push
